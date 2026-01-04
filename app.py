@@ -1,4 +1,7 @@
 import streamlit as st
+from core.db import init_db
+
+init_db()
 
 # =========================
 # CONFIGURACIÓN GENERAL

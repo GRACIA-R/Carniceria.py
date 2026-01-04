@@ -20,11 +20,6 @@ productos = pd.read_sql(
     conn
 )
 
-listas = pd.read_sql(
-    "SELECT id, nombre FROM listas_precios",
-    conn
-)
-
 # =========================
 # SELECCIÓN DE CLIENTE
 # =========================
@@ -36,6 +31,7 @@ cliente_nombre = st.selectbox(
 )
 
 cliente = clientes[clientes["nombre"] == cliente_nombre].iloc[0]
+cliente_id = cliente["id"]
 lista_precio_id = cliente["lista_precio_id"]
 
 # =========================
@@ -50,25 +46,33 @@ producto_nombre = st.selectbox(
 
 producto = productos[productos["nombre"] == producto_nombre].iloc[0]
 
+st.caption(
+    f"Stock disponible: {producto['stock']} {producto['unidad']}"
+)
+
 # =========================
 # PRECIO SEGÚN LISTA
 # =========================
-precio_df = pd.read_sql(
-    """
-    SELECT precio
-    FROM precios_producto
-    WHERE producto_id = ? AND lista_id = ?
-    """,
-    conn,
-    params=(producto["id"], lista_precio_id)
-)
+precio_venta = producto["precio"]
 
-if not precio_df.empty:
-    precio_venta = precio_df.iloc[0]["precio"]
-    st.info(f"Precio especial aplicado: ${precio_venta:.2f}")
+if pd.notna(lista_precio_id):
+    precio_df = pd.read_sql(
+        """
+        SELECT precio
+        FROM precios_producto
+        WHERE producto_id = ? AND lista_id = ?
+        """,
+        conn,
+        params=(producto["id"], int(lista_precio_id))
+    )
+
+    if not precio_df.empty:
+        precio_venta = precio_df.iloc[0]["precio"]
+        st.info(f"💲 Precio especial aplicado: ${precio_venta:.2f}")
+    else:
+        st.info(f"💲 Precio público: ${precio_venta:.2f}")
 else:
-    precio_venta = producto["precio"]
-    st.info(f"Precio público: ${precio_venta:.2f}")
+    st.info(f"💲 Precio público: ${precio_venta:.2f}")
 
 # =========================
 # DATOS DE VENTA
@@ -98,12 +102,15 @@ if st.button("Registrar venta", type="primary"):
         st.error("Stock insuficiente")
         st.stop()
 
-    # --- Inserta venta ---
     cursor = conn.cursor()
 
+    # --- Inserta venta (cabecera) ---
     cursor.execute(
-        "INSERT INTO ventas (fecha, total) VALUES (?, ?)",
-        (str(fecha), total)
+        """
+        INSERT INTO ventas (fecha, cliente_id, total)
+        VALUES (?, ?, ?)
+        """,
+        (str(fecha), cliente_id, total)
     )
 
     venta_id = cursor.lastrowid
@@ -120,7 +127,11 @@ if st.button("Registrar venta", type="primary"):
 
     # --- Actualiza stock ---
     cursor.execute(
-        "UPDATE productos SET stock = stock - ? WHERE id = ?",
+        """
+        UPDATE productos
+        SET stock = stock - ?
+        WHERE id = ?
+        """,
         (cantidad, producto["id"])
     )
 

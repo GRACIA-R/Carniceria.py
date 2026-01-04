@@ -5,30 +5,23 @@ def kpis_globales():
     conn = get_connection()
 
     ventas = pd.read_sql(
-        "SELECT COALESCE(SUM(total),0) as v FROM ventas", conn
-    ).iloc[0]["v"]
+        "SELECT COALESCE(SUM(total), 0) FROM ventas", conn
+    ).iloc[0,0]
 
     compras = pd.read_sql(
-        "SELECT COALESCE(SUM(total),0) as c FROM compras", conn
-    ).iloc[0]["c"]
+        "SELECT COALESCE(SUM(total), 0) FROM compras", conn
+    ).iloc[0,0]
 
     stock = pd.read_sql(
-        """
-        SELECT COALESCE(SUM(stock_kg),0) as stock
-        FROM productos
-        """,
-        conn
-    ).iloc[0]["stock"]
-
-    margen = ventas - compras
+        "SELECT COALESCE(SUM(stock), 0) FROM productos", conn
+    ).iloc[0,0]
 
     return {
         "ventas_totales": ventas,
         "compras_totales": compras,
         "stock_total_kg": stock,
-        "margen_bruto": margen
+        "margen_bruto": ventas - compras
     }
-
 
 
 def margen_por_producto():

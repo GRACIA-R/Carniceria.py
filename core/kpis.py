@@ -1,7 +1,7 @@
 import pandas as pd
 from core.db import get_connection
 
-def get_kpis():
+def kpis_globales():
     conn = get_connection()
 
     ventas = pd.read_sql(

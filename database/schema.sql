@@ -63,11 +63,15 @@ CREATE TABLE IF NOT EXISTS precios_producto (
 -- =========================
 CREATE TABLE IF NOT EXISTS ventas (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    fecha TEXT NOT NULL,
+    fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
     cliente_id INTEGER,
     total REAL NOT NULL,
+    pago REAL NOT NULL,
+    cambio REAL NOT NULL,
+    metodo_pago TEXT,
     FOREIGN KEY (cliente_id) REFERENCES clientes(id)
 );
+
 
 -- =========================
 -- VENTAS (DETALLE)

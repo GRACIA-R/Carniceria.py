@@ -81,10 +81,12 @@ CREATE TABLE IF NOT EXISTS venta_detalle (
     venta_id INTEGER NOT NULL,
     producto_id INTEGER NOT NULL,
     cantidad REAL NOT NULL,
-    precio REAL NOT NULL,
+    precio_unitario REAL NOT NULL,
+    subtotal REAL NOT NULL,
     FOREIGN KEY (venta_id) REFERENCES ventas(id),
     FOREIGN KEY (producto_id) REFERENCES productos(id)
 );
+
 
 -- =========================
 -- COMPRAS (CABECERA)

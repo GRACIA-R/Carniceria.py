@@ -17,7 +17,7 @@ kpis = kpis_globales()
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("💰 Ventas totales", f"${kpis['ventas_totales']:.2f}")
 col2.metric("🛒 Compras totales", f"${kpis['compras_totales']:.2f}")
-col3.metric("📦 Stock total (kg)", f"{kpis['stock_total_kg']:.1f}")
+col3.metric("📦 Stock total", f"{kpis['stock_total']:.1f}")
 col4.metric("📈 Margen bruto", f"${kpis['margen_bruto']:.2f}")
 
 st.divider()

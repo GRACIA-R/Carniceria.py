@@ -1,41 +1,34 @@
 import pandas as pd
 from core.db import get_connection
 
-
-def kpis_globales():
+def get_kpis():
     conn = get_connection()
 
     ventas = pd.read_sql(
-        "SELECT COALESCE(SUM(total), 0) AS total FROM ventas",
-        conn
-    ).iloc[0, 0]
+        "SELECT COALESCE(SUM(total),0) as v FROM ventas", conn
+    ).iloc[0]["v"]
 
-    # Compras: asumimos que la tabla guarda el monto directamente
     compras = pd.read_sql(
-        "SELECT COALESCE(SUM(total), 0) AS total FROM compras",
-        conn
-    ).iloc[0, 0]
+        "SELECT COALESCE(SUM(total),0) as c FROM compras", conn
+    ).iloc[0]["c"]
 
-    stock_total = pd.read_sql(
-        "SELECT COALESCE(SUM(stock), 0) AS total FROM productos",
-        conn
-    ).iloc[0, 0]
-
-    valor_inventario = pd.read_sql(
+    stock = pd.read_sql(
         """
-        SELECT COALESCE(SUM(stock * costo), 0)
+        SELECT COALESCE(SUM(stock_kg),0) as stock
         FROM productos
         """,
         conn
-    ).iloc[0, 0]
+    ).iloc[0]["stock"]
+
+    margen = ventas - compras
 
     return {
         "ventas_totales": ventas,
         "compras_totales": compras,
-        "stock_total": stock_total,
-        "valor_inventario": valor_inventario,
-        "margen_bruto": ventas - compras
+        "stock_total_kg": stock,
+        "margen_bruto": margen
     }
+
 
 
 def margen_por_producto():

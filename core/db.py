@@ -6,13 +6,12 @@ DB_PATH = os.path.join(DB_DIR, "carniceria.db")
 
 SCHEMA_PATH = os.path.join(DB_DIR, "schema.sql")
 
+@st.cache_resource
 def init_db():
     os.makedirs(DB_DIR, exist_ok=True)
-
     conn = sqlite3.connect(DB_PATH, check_same_thread=False)
 
-    # Crear tablas si no existen
-    with open(SCHEMA_PATH, "r") as f:
+    with open(SCHEMA_PATH, "r", encoding="utf-8") as f:
         conn.executescript(f.read())
 
     conn.commit()

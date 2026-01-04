@@ -16,7 +16,7 @@ st.set_page_config(
 # =========================
 # HEADER
 # =========================
-st.title("🥩 Carnicería TOO 2000")
+st.title("🥩 Carnicería TORO 2000")
 st.markdown("""
 **Sistema de inventarios, ventas, compras y control financiero**  
 """)

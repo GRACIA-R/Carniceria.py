@@ -6,26 +6,26 @@ def kpis_globales():
     conn = get_connection()
 
     ventas = pd.read_sql(
-        "SELECT COALESCE(SUM(total), 0) FROM ventas",
+        "SELECT COALESCE(SUM(total), 0) AS total FROM ventas",
         conn
     ).iloc[0, 0]
 
     compras = pd.read_sql(
         """
-        SELECT COALESCE(SUM(cantidad_kg * costo_kg), 0)
+        SELECT COALESCE(SUM(kg * costo), 0) AS total
         FROM compras
         """,
         conn
     ).iloc[0, 0]
 
     stock_total = pd.read_sql(
-        "SELECT COALESCE(SUM(stock), 0) FROM productos",
+        "SELECT COALESCE(SUM(stock), 0) AS total FROM productos",
         conn
     ).iloc[0, 0]
 
     valor_inventario = pd.read_sql(
         """
-        SELECT COALESCE(SUM(stock * costo), 0)
+        SELECT COALESCE(SUM(stock * costo), 0) AS total
         FROM productos
         """,
         conn
@@ -51,11 +51,13 @@ def margen_por_producto():
             precio,
             stock,
             (precio - costo) AS margen_unitario,
-            CASE
-                WHEN precio > 0
-                THEN ROUND((precio - costo) / precio * 100, 2)
-                ELSE 0
-            END AS margen_pct
+            ROUND(
+                CASE
+                    WHEN precio > 0
+                    THEN (precio - costo) / precio * 100
+                    ELSE 0
+                END, 2
+            ) AS margen_pct
         FROM productos
         ORDER BY margen_unitario DESC
         """,

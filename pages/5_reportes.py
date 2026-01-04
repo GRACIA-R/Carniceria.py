@@ -55,3 +55,8 @@ st.subheader("⚠️ Productos con bajo stock")
 df_low = low_stock()
 st.dataframe(df_low, use_container_width=True)
 
+from core.kpis import margen_por_producto
+
+st.subheader("📈 Margen por producto")
+df_margen = margen_por_producto()
+st.dataframe(df_margen, use_container_width=True)
